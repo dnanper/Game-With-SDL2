@@ -85,6 +85,8 @@ bool Engine::Init()
 // Load sounds
     Sound::GetInstance()->LoadEffect("shoot", "audio/gun.mp3");
     Sound::GetInstance()->LoadEffect("e_dead", "audio/enemy_dead2.wav");
+    Sound::GetInstance()->LoadMusic("bg", "audio/Menu.wav");
+    Sound::GetInstance()->PlayMusic("bg");
 // Load Text
     MenuText.push_back(&Play);
     MenuText.push_back(&Pause);
@@ -93,6 +95,9 @@ bool Engine::Init()
     PauseText.push_back(&Continue);
     PauseText.push_back(&Home);
     PauseText.push_back(&Restart);
+
+    DieText.push_back(&Home);
+    DieText.push_back(&Restart);
 
     Play.Set_Text("Start Game");
     Play.Set_Rect(m_Play);
@@ -106,6 +111,10 @@ bool Engine::Init()
     Home.Set_Rect(m_Home);
     Restart.Set_Text("Restart");
     Restart.Set_Rect(m_Restart);
+
+    YouDie.Set_Text("YOU DIE!!!");
+    YouDie.SetColor(Text::WHITECOLOR);
+    YouDie.LoadFromRenderText(Menu_Font, m_Renderer);
 
     for (auto x : PauseText)
     {
@@ -181,10 +190,56 @@ void Engine::Update()
                 (*x).LoadFromRenderText(Pause_Font, m_Renderer);
             }
         }
-
     }
+    if ( m_Ending )
+    {
+        int mouse_X = Input::GetInstance()->GetMouseX();
+        int mouse_Y = Input::GetInstance()->GetMouseY();
+        for ( auto x : DieText )
+        {
+            if ( mouse_X >= (*x).m_Rect.x && mouse_X <= (*x).m_Rect.x + (*x).m_Rect.w &&
+                 mouse_Y >= (*x).m_Rect.y && mouse_Y <= (*x).m_Rect.y + (*x).m_Rect.h )
+            {
+                (*x).SetColor(Text::REDCOLOR);
+                (*x).LoadFromRenderText(Pause_Font, m_Renderer);
+                if ( ((*x).GetText() == "Home") && Input::GetInstance()->GetMouseCheckLeft() )
+                {    
+                    m_Starting = 0;
+                    m_Pausing = 0;
+                    m_Ending = 0;
+                    player->Refresh();
+                    p_bullet_list.clear();
+                    m_enemy_list.clear();
+                    mark = 0;
+                    for (auto &type : type3_pos_list)
+                    {
+                        type.second = 0;
+                    }
+                }
+                if ( ((*x).GetText() == "Restart") && Input::GetInstance()->GetMouseCheckLeft() )
+                {
+                    m_Pausing = 0;
+                    m_Ending = 0;
+                    player->Refresh();
+                    p_bullet_list.clear();
+                    m_enemy_list.clear();
+                    mark = 0;
+                    for (auto &type : type3_pos_list)
+                    {
+                        type.second = 0;
+                    }
+                }
+            }
+            else
+            {
+                (*x).SetColor(Text::WHITECOLOR);
+                (*x).LoadFromRenderText(Pause_Font, m_Renderer);
+            }
+        }
+    }
+
     // Menu
-    if ( !m_Starting )
+    if ( !m_Starting && !m_Ending )
     {
         int mouse_X = Input::GetInstance()->GetMouseX();
         int mouse_Y = Input::GetInstance()->GetMouseY();
@@ -208,7 +263,7 @@ void Engine::Update()
         }
     }   
 
-    if ( m_Starting && !m_Pausing )
+    if ( m_Starting && !m_Pausing && !m_Ending )
     {    
         if ( Input::GetInstance()->GetKeyDown(SDL_SCANCODE_ESCAPE) )
         {
@@ -223,9 +278,20 @@ void Engine::Update()
         {
         //    std::cout << " Create new enemy\n";
         //type 1
+            int i = 0;
+            for ( auto e = m_enemy_list.begin(); e != m_enemy_list.end(); e++)
+            {
+                if ( (*e).second == "enemy_idle" )
+                {
+                    i++;
+                }
+            }
+            if ( i < 5 )
+            {
             Enemy* enemy = new Enemy(new Properties("enemy", 1350, 1350, 60 ,60));
             enemy->setType("enemy_idle");
             m_enemy_list.push_back({enemy, "enemy_idle"});
+            }
         //type 2
             Enemy* enemy2 = new Enemy(new Properties("enemy", 1300, 1300, 60 ,60));
             enemy2->setType("enemy_idle2");
@@ -265,6 +331,8 @@ void Engine::Update()
             m_enemy_list[i].first->Update(dt);
             //std::cout << m_enemy_list[i].second << std::endl;
         }
+        for (auto x : p_shield_list)
+            x->Update(dt);
         for (auto x : p_bullet_list)
             x.first->Update(dt);
 
@@ -291,6 +359,25 @@ void Engine::Update()
                 // }
             }
         }
+        // check shiled broke
+        for ( auto s = p_shield_list.begin(); s != p_shield_list.end(); s++)
+        {
+            if ( (*s)->getSur() == TI )
+            {
+                (*s)->setIsDead();
+            }
+        }
+        // check shield-bullet collision
+        for (auto b = p_bullet_list.begin(); b != p_bullet_list.end(); b++ )
+        {
+            for (auto s = p_shield_list.begin(); s != p_shield_list.end(); s++)
+            {
+                if (CollisionHandler::GetInstance()->CheckCollision( (*s)->getCollider()->Get(), (*b).first->getCollider()->Get() ))
+                {
+                    (*b).first->setIsDead();
+                }
+            }
+        }
         // check e_bullet-player collision
         for ( auto b = p_bullet_list.begin(); b != p_bullet_list.end(); b++)
         {
@@ -298,7 +385,7 @@ void Engine::Update()
             {
                 if (CollisionHandler::GetInstance()->CheckCollision( player->GetCollider()->Get(), (*b).first->getCollider()->Get() ))
                 {
-                    player->setHealth(-B_DAME);
+                    player->setHealth(-B_DAME_1);
                     (*b).first->setIsDead();
                 }
             }
@@ -311,6 +398,13 @@ void Engine::Update()
                 }
             }
         }
+        // check m_Ending
+        if ( player->getHealth() <= 0 )
+        {
+            m_Ending = 1;
+            //m_Starting = 0;
+        }
+
         // check enemy1-player collision
         for ( auto e = m_enemy_list.begin(); e != m_enemy_list.end(); e++)
         {
@@ -357,6 +451,14 @@ void Engine::Update()
             else
                 x++;
         }
+        // check sheid dead
+        for (auto x = p_shield_list.begin(); x != p_shield_list.end();)
+        {
+            if ( (*x)->getIsDead() )
+                p_shield_list.erase(x);
+            else
+                x++;
+        }
         // check player dead
         if ( player->getHealth() < 0 )
         {
@@ -371,7 +473,7 @@ void Engine::Render()
 {
     SDL_SetRenderDrawColor( m_Renderer, 124, 218, 254, 255);
     SDL_RenderClear(m_Renderer);
-    if ( !m_Starting && !m_Pausing )
+    if ( !m_Starting && !m_Pausing && !m_Ending )
     {
         TextureManager::GetInstance()->DrawBG("menu_bg", 0, 0, 900, 900, 1, 0);
         Play.RenderText(m_Renderer, 320, 600 );
@@ -387,7 +489,8 @@ void Engine::Render()
         player->Draw();
         for (unsigned int i = 0; i != m_enemy_list.size(); i++)
             m_enemy_list[i].first->Draw();
-
+        for (auto x : p_shield_list)
+            x->Draw();
         for (auto x : p_bullet_list)
             x.first->Draw();
         
@@ -403,6 +506,14 @@ void Engine::Render()
         Continue.RenderText(m_Renderer, 370, 365 );
         Restart.RenderText(m_Renderer, 375, 425 );
         Home.RenderText(m_Renderer, 400, 485 );
+    }
+
+    if ( m_Ending )
+    {
+        TextureManager::GetInstance()->DrawBG("pause_bg", 200 , 200, 500, 500, 1, 0);
+        Restart.RenderText(m_Renderer, 375, 425 );
+        Home.RenderText(m_Renderer, 400, 485 );
+        YouDie.RenderText(m_Renderer, 350, 300);
     }
 
     SDL_RenderPresent(m_Renderer);
@@ -421,6 +532,9 @@ bool Engine::Clean()
 
     for (auto x : p_bullet_list)
         x.first->Clean();
+
+    for (auto x : p_shield_list)
+        x->Clean();
 
     for (auto x : MenuText )
         (*x).Free();

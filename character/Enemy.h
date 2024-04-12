@@ -7,6 +7,7 @@
 #include "../physics/Collider.h"
 #include "../physics/Vector2D.h"
 #include "../sounds/Sound.h"
+#include "../star/garlic.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -16,6 +17,11 @@
 #define E_HEALTH_TYPE 15
 #define E_SPEED_TYPE_2 4
 
+using namespace std;
+
+typedef pair<int, int> Pair;
+typedef pair<double, pair<int, int> > pPair;
+
 class Enemy: public Character
 {
     public:
@@ -24,13 +30,18 @@ class Enemy: public Character
         virtual void Clean();
         virtual void Update(float dt);
 
+        float target_X_type1;
+        float target_Y_type1;
         float target_X;
         float target_Y;
         float target_type3_X;
         float target_type3_Y;
+        double a_angle;
         double e_angle;
         int type3_pos;
         int e_health = E_HEALTH_TYPE;
+
+
         
         Collider* getCollider() { return m_Collider; }
         bool getIsBlown() { return blown; }
@@ -40,6 +51,8 @@ class Enemy: public Character
         int blowTime = 0;
         std::vector<std::pair<int,int>> m_type3_pos_list = 
         { {1000, 1350}, {1160, 1175}, {1350,1100}, {1500,1175}, {1630,1350}, {1500,1525}, {1350,1600}, {1160,1525} };
+
+        TileMap grid = CollisionHandler::GetInstance()->GetTileMap();
     
     private:
         bool blown = 0;

@@ -7,6 +7,7 @@
 #include "../map/GameMap.h"
 #include "../object/GameObject.h"  
 #include "../bullet/Bullet.h"
+#include "../shield/Shield.h"
 #include "../character/Phanora.h"
 #include "../character/Enemy.h"
 #include "../text/Text.h"
@@ -45,6 +46,7 @@ class Engine
         inline bool IsRunning()  { return m_IsRunning; }
         inline SDL_Renderer* GetRenderer()  { return m_Renderer; }
         std::vector<std::pair<Bullet*, std::string>> p_bullet_list;
+        std::vector<Shield*> p_shield_list;
         // std::vector<GameObject*> m_GameObjects;
         std::vector<std::pair<Enemy*, std::string>> m_enemy_list;
         Phanora* player = nullptr;
@@ -58,10 +60,12 @@ class Engine
         TTF_Font *Pause_Font = nullptr;
         Text Mark, numsMark;
         Text Play, Exit, Pause, Restart, Continue, Home;
+        Text YouDie;
         SDL_Rect m_Play = {320, 600, 260, 50}, m_Exit = {400, 675, 100, 50}, m_Pause;
         SDL_Rect m_Continue = {370, 365, 160, 35}, m_Restart = { 375, 425, 150, 35}, m_Home = { 400, 480, 100, 35 };
         std::vector< Text*> MenuText;
         std::vector< Text*> PauseText;
+        std::vector< Text*> DieText;
 
         Bullet* Shield = nullptr;
 
@@ -82,6 +86,7 @@ class Engine
 
         bool m_Starting = 0;
         bool m_Pausing = 0;
+        bool m_Ending = 0;
 };
 
 #endif  // ENGINE_H

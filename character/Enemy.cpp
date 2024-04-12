@@ -23,7 +23,10 @@ Enemy::Enemy(Properties* props): Character(props)
 
 void Enemy::Draw()
 {
-    m_Animation->Draw(m_Transform->X, m_Transform->Y, m_Width, m_Height, e_angle);
+    if ( enemy_Type == "enemy_idle" )
+        m_Animation->Draw(m_Transform->X, m_Transform->Y, m_Width, m_Height, a_angle);
+    else 
+        m_Animation->Draw(m_Transform->X, m_Transform->Y, m_Width, m_Height, e_angle);
     // SDL_Rect box = m_Collider->Get();
     // SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &box);
 }
@@ -35,16 +38,29 @@ void Enemy::Update(float dt)
     //movement
     target_X = Engine::GetInstance()->player->m_Transform->X;
     target_Y = Engine::GetInstance()->player->m_Transform->Y;
-
+//
     e_angle = -90 +  atan2( target_Y - m_Transform->Y, target_X - m_Transform->X ) * ( 180/PI);
     if ( e_angle < 0 ) e_angle = 360 + e_angle;
     e_angle += 180;
 // type 1
     if ( enemy_Type == "enemy_idle")
     {
+// A*
+        Pair dest = { ((int)Engine::GetInstance()->player->m_Transform->X)/30, ((int)Engine::GetInstance()->player->m_Transform->Y)/30 };
+        Pair src =  { ((int)m_Transform->X)/30, ((int)m_Transform->Y)/30 };
+        Pair res;
+        res = garlic::aStarSearch( grid, src, dest );
+        target_X_type1 = (float)res.first*30;
+        target_Y_type1 = (float)res.second*30;
+//
+        a_angle = -90 +  atan2(  target_Y_type1 - m_Transform->Y, target_X_type1 - m_Transform->X ) * ( 180/PI);
+        if ( a_angle < 0 ) a_angle = 360 + a_angle;
+        a_angle += 180;
         m_Animation->SetProps("enemy_idle", 1, 6, 80);
-        if ( !blown) m_RigidBody->ApplyForceX(E_SPEED_TYPE_1*cos( (e_angle+270)*PI/180 ));
-        if ( !blown) m_RigidBody->ApplyForceY(E_SPEED_TYPE_1*sin( (e_angle+270)*PI/180 ));
+        if ( !blown) m_RigidBody->ApplyForceX(E_SPEED_TYPE_1*cos( (a_angle+270)*PI/180 ));
+        if ( !blown) m_RigidBody->ApplyForceY(E_SPEED_TYPE_1*sin( (a_angle+270)*PI/180 ));
+        // if ( !blown) m_RigidBody->ApplyForceX(E_SPEED_TYPE_1*cos( (e_angle+270)*PI/180 ));
+        // if ( !blown) m_RigidBody->ApplyForceY(E_SPEED_TYPE_1*sin( (e_angle+270)*PI/180 ));
     }
 // type 2
     else if (enemy_Type == "enemy_idle2" )
@@ -63,7 +79,7 @@ void Enemy::Update(float dt)
             else
             {
         // bullet
-                if ( CurrentTime > LastTime+100 )
+                if ( CurrentTime > LastTime+200 )
                 {
                     EshotTime_type2 ++;
                     Bullet* p_bullet=new Bullet(new Properties("bullet", 450, 450, 10 ,30));

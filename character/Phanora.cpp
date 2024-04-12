@@ -8,6 +8,7 @@
 #include "../collision/CollisionHandler.h"
 #include "../factory/ObjectFactory.h"
 #include "../bullet/Bullet.h"
+#include "../shield/Shield.h"
 #include <math.h>
 
 static Registrar<Phanora> registrar("PLAYER");
@@ -134,8 +135,19 @@ void Phanora::Update(float dt)
     {
         canspawnbullet = 0;
     }
+
+    if ( Input::GetInstance()->GetMouseCheckRight() )
+    {
+        shieldup = 1;
+    }
+
+    if ( !Input::GetInstance()->GetMouseCheckRight() )
+    {
+        shieldup = 0;
+    }
+
     CurrentTime=SDL_GetTicks();
-    if ( canspawnbullet && ( CurrentTime>LastTime+200) )
+    if ( canspawnbullet && ( CurrentTime>LastTime+200) && !shieldup )
     {
         //std::cout << "create new bullet\n";
         //i++;
@@ -152,6 +164,17 @@ void Phanora::Update(float dt)
         // {
         //     std::cout << i << std::endl;
         // }
+    }
+
+    if ( shieldup && !canspawnbullet  && (CurrentTime>LastTime+1000) )
+    {
+        std::cout << "shield up\n";
+        Shield* p_shield = new Shield(new Properties("sheild", 450, 450, 120, 40));
+        p_shield->p_angle = angle;
+        p_shield->Set_xpos(m_Transform->X+m_Width/2-60);
+        p_shield->Set_ypos(m_Transform->Y + m_Height/2);
+        Engine::GetInstance()->p_shield_list.push_back(p_shield);
+        LastTime = CurrentTime;
     }
 
     m_Animation->Update();

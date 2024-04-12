@@ -43,6 +43,7 @@ class Phanora : public Character
         unsigned long long LastTime = 0;
 
         bool canspawnbullet = 0;
+        bool shieldup = 0;
 
         //int i = 0;
         

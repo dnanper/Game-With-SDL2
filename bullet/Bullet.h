@@ -12,6 +12,7 @@
 #define PI 3.14159265358979323846
 #define B_SPEED 8
 #define B_DAME 5
+#define B_DAME_1 2
 #define B_DAME_2 1
 
 class Bullet : public Character
