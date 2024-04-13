@@ -61,13 +61,13 @@ class Engine
         Text Mark, numsMark;
         Text Play, Exit, Pause, Restart, Continue, Home;
         Text YouDie;
+        Text HighScore, numsHighScore;
         SDL_Rect m_Play = {320, 600, 260, 50}, m_Exit = {400, 675, 100, 50}, m_Pause;
         SDL_Rect m_Continue = {370, 365, 160, 35}, m_Restart = { 375, 425, 150, 35}, m_Home = { 400, 480, 100, 35 };
         std::vector< Text*> MenuText;
         std::vector< Text*> PauseText;
         std::vector< Text*> DieText;
-
-        Bullet* Shield = nullptr;
+        // Bullet* Shield = nullptr;
 
     private:
         Engine(){}
@@ -79,6 +79,7 @@ class Engine
         static Engine* s_Instance;
 
         int mark = 0;
+        std::string highscore;
 
         long long time = 0;
         bool boss = 0;

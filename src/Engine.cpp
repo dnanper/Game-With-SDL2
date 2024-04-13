@@ -15,6 +15,9 @@
 #include "../collision/CollisionHandler.h"
 #include "../physics/Vector2D.h"
 #include <vector>
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -128,14 +131,25 @@ bool Engine::Init()
         (*x).LoadFromRenderText(Menu_Font, m_Renderer);
     }   
 
+    HighScore.SetColor(Text::REDCOLOR);
+    HighScore.Set_Text("High Score: ");
+    HighScore.LoadFromRenderText(Font, m_Renderer);
+
     Mark.SetColor(Text::REDCOLOR);
     string str_Mark = "SCORE: ";
     Mark.Set_Text(str_Mark);
     Mark.LoadFromRenderText(Font, m_Renderer);
 
     numsMark.SetColor(Text::WHITECOLOR);
+    numsHighScore.SetColor(Text::WHITECOLOR);
 //
-    //Properties* props = new Properties("player", 450, 450, 60, 60);
+    std::fstream HighScoreFile;
+	HighScoreFile.open("src/Save.txt");
+    if ( !HighScoreFile.is_open() )
+        std::cout << "chua mo\n";
+    else std::cout << "da mo\n";
+	HighScoreFile >> highscore;
+//
     player = new Phanora(new Properties("player", 450, 450, 60, 60));
 
     Camera::GetInstance()->SetTarget(player->GetOrigin());
@@ -145,6 +159,7 @@ bool Engine::Init()
 void Engine::Update()
 {
     // Pause
+    //Mix_Volume(-1, 16);
     if ( m_Pausing )
     {
         int mouse_X = Input::GetInstance()->GetMouseX();
@@ -265,6 +280,9 @@ void Engine::Update()
 
     if ( m_Starting && !m_Pausing && !m_Ending )
     {    
+        // read highscore from txt
+        //std::cout << highscore << endl;
+        //
         if ( Input::GetInstance()->GetKeyDown(SDL_SCANCODE_ESCAPE) )
         {
             m_Pausing = 1;
@@ -443,6 +461,15 @@ void Engine::Update()
             else
                 x++;
         }
+        // high score
+            std::fstream HighScoreFile;
+            HighScoreFile.open("src/Save.txt");
+            if ( mark > stoi(highscore) )
+            {
+                highscore = to_string(mark);
+            }
+            HighScoreFile << highscore;
+        //
         // check bullet_dead
         for (auto x = p_bullet_list.begin(); x != p_bullet_list.end(); )
         {
@@ -494,6 +521,11 @@ void Engine::Render()
         for (auto x : p_bullet_list)
             x.first->Draw();
         
+        HighScore.RenderText(m_Renderer,10, 50 );
+        numsHighScore.Set_Text(highscore);
+        numsHighScore.LoadFromRenderText(Font, m_Renderer);
+        numsHighScore.RenderText(m_Renderer, 170, 50);
+
         Mark.RenderText(m_Renderer, 10, 10);
         numsMark.Set_Text(to_string(mark));
         numsMark.LoadFromRenderText(Font, m_Renderer);
