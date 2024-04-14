@@ -147,7 +147,7 @@ void Phanora::Update(float dt)
     }
 
     CurrentTime=SDL_GetTicks();
-    if ( canspawnbullet && ( CurrentTime>LastTime+200) && !shieldup )
+    if ( canspawnbullet && ( CurrentTime>LastTime+100) && !shieldup )
     {
         //std::cout << "create new bullet\n";
         //i++;
