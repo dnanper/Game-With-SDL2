@@ -36,19 +36,23 @@ void Bullet::Update(float dt)
     {
         m_Animation->SerPropsDraw("e_bullet", 10, 30, p_angle);
     }
-    else
+    else if ( bullet_Type == "bullet" )
     {
         m_Animation->SerPropsDraw("bullet", 10, 30, p_angle);
+    }
+    else if ( bullet_Type == "orb_1" )
+    {
+        m_Animation->SerPropsDraw("orb_1", 30, 30, 90);
     }
     //m_Animation->SerPropsDraw(m_TextureID, 10, 30, p_angle);
     m_RigidBody->UnSetForce();
     //std::cout << p_angle << std::endl;
-    if ( bullet_Type != "e_bullet2" )
+    if ( bullet_Type != "e_bullet2" && bullet_Type != "orb_1" )
     {    
         m_RigidBody->ApplyForceX(B_SPEED*cos( (p_angle+270)*PI/180 ));
         m_RigidBody->ApplyForceY(B_SPEED*sin( (p_angle+270)*PI/180 ));
     }
-    else
+    else if ( bullet_Type == "e_bullet2" )
     {
         m_RigidBody->ApplyForceX(B_SPEED*1.5*cos( (p_angle+270)*PI/180 ));
         m_RigidBody->ApplyForceY(B_SPEED*1.5*sin( (p_angle+270)*PI/180 ));

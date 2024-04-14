@@ -4,6 +4,7 @@
 #include "../collision/CollisionHandler.h"
 #include "../map/TileLayer.h"
 #include "../map/GameMap.h"
+#include "../inc/SDL.h"
 #include <math.h>
 #include<iostream>
 #include<utility>
@@ -42,6 +43,12 @@ class garlic
         {
             if (grid[row][col] == 0) return (true);
             else return (false);
+            // SDL_Rect rect;
+            // rect.x = col * 30;
+            // rect.y = row * 30;
+            // rect.w = 30;
+            // rect.h = 30;
+            // return !(CollisionHandler::GetInstance()->MapCollision(rect));
         }
 
 

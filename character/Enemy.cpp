@@ -6,6 +6,8 @@
 #include "../camera/Camera.h"
 #include <iostream>
 #include "../factory/ObjectFactory.h"
+#include <random>
+#include <time.h>
 #include <math.h>
 
 static Registrar<Enemy> registrar("ENEMY");
@@ -216,7 +218,7 @@ void Enemy::Update(float dt)
     {
         m_Transform->Y = m_LastSafePosition.Y;
     }
-    // death
+// death
     if ( blown ) 
     {
         std::cout << "now blow!\n";
@@ -227,6 +229,16 @@ void Enemy::Update(float dt)
         {
             dead = 1;
             blowTime = 0;
+        }
+        srand(time(0));
+        if ( (int)rand() % 4 == 0 )
+        {
+            Bullet* p_bullet=new Bullet(new Properties("bullet", 450, 450, 10 ,30));
+            p_bullet->setType("orb_1");
+            p_bullet->Set_xpos(m_Transform->X + m_Width/2);
+            p_bullet->Set_ypos(m_Transform->Y + m_Height/2);
+            p_bullet->p_angle = e_angle;
+            Engine::GetInstance()->p_bullet_list.push_back({p_bullet, "orb_1"});
         }
         Sound::GetInstance()->PlayEffect("e_dead");
     }

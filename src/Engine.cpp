@@ -83,6 +83,8 @@ bool Engine::Init()
 
     TextureManager::GetInstance()->Load("menu_bg", "image/menu_bg.png");
     TextureManager::GetInstance()->Load("pause_bg", "image/pause.png");
+
+    TextureManager::GetInstance()->Load("orb_1", "image/orb_1.png");
 //
 
 // Load sounds
@@ -304,7 +306,7 @@ void Engine::Update()
                     i++;
                 }
             }
-            if ( i < 5 )
+            if ( i < 3 )
             {
             Enemy* enemy = new Enemy(new Properties("enemy", 1350, 1350, 60 ,60));
             enemy->setType("enemy_idle");
@@ -390,7 +392,7 @@ void Engine::Update()
         {
             for (auto s = p_shield_list.begin(); s != p_shield_list.end(); s++)
             {
-                if (CollisionHandler::GetInstance()->CheckCollision( (*s)->getCollider()->Get(), (*b).first->getCollider()->Get() ))
+                if (CollisionHandler::GetInstance()->CheckCollision( (*s)->getCollider()->Get(), (*b).first->getCollider()->Get() ) && (*b).second != "orb_1")
                 {
                     (*b).first->setIsDead();
                 }
@@ -412,6 +414,16 @@ void Engine::Update()
                 if (CollisionHandler::GetInstance()->CheckCollision( player->GetCollider()->Get(), (*b).first->getCollider()->Get() ))
                 {
                     player->setHealth(-B_DAME_2);
+                    (*b).first->setIsDead();
+                }
+            }
+            else if ( (*b).second == "orb_1" )
+            {
+                if (CollisionHandler::GetInstance()->CheckCollision( player->GetCollider()->Get(), (*b).first->getCollider()->Get() ))
+                {
+                    player->setHealth(-B_HEAL_1);
+                    if ( player->getHealth() > HEALTH )
+                        player->setHealth(-(player->getHealth()-HEALTH));
                     (*b).first->setIsDead();
                 }
             }
@@ -494,6 +506,7 @@ void Engine::Update()
         Camera::GetInstance()->Update(dt);  
         m_LevelMap->Update();
     }
+
 }
 
 void Engine::Render()
