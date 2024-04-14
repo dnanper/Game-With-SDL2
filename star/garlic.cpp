@@ -16,7 +16,7 @@ bool garlic::isDestination(int row, int col, Pair dest)
     else
         return (false);
 }
-
+// f = g + h
 double garlic::calculateHValue(int row, int col, Pair dest)
 {  
     return ((double)sqrt(
@@ -40,11 +40,12 @@ Pair garlic::tracePath(cell cellDetails[][COL], Pair dest)
         row = temp_row;
         col = temp_col;
     }
- 
     Path.push(make_pair(row, col));
+    if ( Path.size() <= 1 )
+        return make_pair(row, col);
     Path.pop();
         pair<int, int> p = Path.top();
- 
+
     return p;
 }
 
