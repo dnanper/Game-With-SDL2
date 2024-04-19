@@ -44,8 +44,7 @@ Nó sẽ dí theo người chơi đến một khoảng cách nhất định và 
 - Xuất/Nhập file lưu dữ liệu
 - Sử dụng thuật toán A*
 
+**Lời bạt**  
+Dựa trên barem chấm điểm của thầy, điểm của kỳ vọng của bọn em là 9.5 ạ.
+
 **Thanks for your attention!!!**
-
-
-
-
