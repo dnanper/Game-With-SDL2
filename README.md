@@ -43,7 +43,6 @@ Nó sẽ dí theo người chơi đến một khoảng cách nhất định và 
 - Sử dụng Animation
 - Xuất/Nhập file lưu dữ liệu
 - Sử dụng thuật toán A*
-- AI cơ bản cho các đối tượng trong game  
 
 **Thanks for your attention!!!**
 
