@@ -44,7 +44,7 @@ Pair garlic::tracePath(cell cellDetails[][COL], Pair dest)
     if ( Path.size() <= 1 )
         return make_pair(row, col);
     Path.pop();
-        pair<int, int> p = Path.top();
+    pair<int, int> p = Path.top();
 
     return p;
 }

@@ -14,7 +14,7 @@
 #define B_DAME 5
 #define B_DAME_1 2
 #define B_DAME_2 1
-#define B_HEAL_1 -5
+#define B_HEAL_1 -2
 
 class Bullet : public Character
 {

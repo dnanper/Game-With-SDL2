@@ -81,7 +81,7 @@ void Enemy::Update(float dt)
             else
             {
         // bullet
-                if ( CurrentTime > LastTime+200 )
+                if ( CurrentTime > LastTime+150 )
                 {
                     EshotTime_type2 ++;
                     Bullet* p_bullet=new Bullet(new Properties("bullet", 450, 450, 10 ,30));

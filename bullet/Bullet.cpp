@@ -75,7 +75,7 @@ void Bullet::Update(float dt)
     m_Collider->Set(x_pos, y_pos, 10, 30);
     if (CollisionHandler::GetInstance()->MapCollision(m_Collider->Get()))
     {
-        y_pos = m_LastSafePosition.X;
+        y_pos = m_LastSafePosition.Y;
         isDead = 1;
     }
 
