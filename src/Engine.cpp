@@ -306,7 +306,7 @@ void Engine::Update()
                     i++;
                 }
             }
-            if ( i < 3 )
+            if ( i < 7 )
             {
             Enemy* enemy = new Enemy(new Properties("enemy", 1350, 1350, 60 ,60));
             enemy->setType("enemy_idle");
